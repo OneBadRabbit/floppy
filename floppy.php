@@ -41,7 +41,22 @@ function awp_add_new() {
 
 function awp_create_cards () { 
 
-    echo ' I am Creating a New Card ';
+    if ( !$_POST ) { 
+        $values = array();
+    } else { 
+        $values = $_POST;
+    }
+    
+    if ( current_user_can ( 'edit_posts' ) ) { 
+
+        echo ' I am Creating a New Card ';
+        include ( plugin_dir_url . "include/forms/newCardForm.php" );
+
+    } else {
+
+        echo " You are Not Allowed! ";
+
+    }
 
 }
 
@@ -66,7 +81,7 @@ add_shortcode( 'awpshort', 'awp_shortcode' );
 function awp_shortcode ( $atts = [], $awpID = null ) { 
 
     global $wpdb;
-    
+
     // Go Get & Return Card Content for Post Page
 
 }
