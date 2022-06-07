@@ -3,7 +3,7 @@
 defined ( 'ABSPATH' ) OR exit;
 
 /*
- * Plugin Name: AWP Floppy
+ * Plugin Name: OBR Floppy
  * Plugin Url: https://onebadrabbit.com
  * Description: Extremely simplified flash card tool. Accepts images and text as questions and answers.
  * Version: 1.0.0
@@ -19,9 +19,9 @@ defined ( 'ABSPATH' ) OR exit;
 /*
  * Admin Menu?
 */
-add_action ( 'admin_menu' , 'awp_add_new' );
+add_action ( 'admin_menu' , 'obr_add_new' );
 
-function awp_add_new() { 
+function obr_add_new() { 
     
     add_menu_page( 
         'AWP Floppy',
@@ -29,17 +29,28 @@ function awp_add_new() {
         'manage_options',
         'awpfloppy',
         'awp_create_cards',
-        plugin_dir_url( __FILE__ . 'images/awpFloppy_icon.png',
+        plugin_dir_url( __FILE__ . 'images/obrFloppy_icon.png',
         20
     );
 
 )
 
+function obr_admin_enqueue ( $hook ) {
+    if ('edit.php' != $hook ) { 
+        return;
+    }
+    wp_enqueue_script ( 'style.css', plugin_dir_url( __FILE__ ) . '/css/style.css', array(), '1.0.0' );
+
+}
+
+
+add_action ( 'admin_enqueue_scripts', 'obr_admin_enqueue' );
+
 /*
  * Get New Card Form
 */
 
-function awp_create_cards () { 
+function obr_create_cards () { 
 
     if ( !$_POST ) { 
         $values = array();
@@ -64,9 +75,14 @@ function awp_create_cards () {
  * Show Card List w/ shortcodes
 */
 
-function awp_list_cards () { 
+function obr_list_cards () { 
+
+    global $wpdb;
 
     echo 'I am Showing the Created Cards List ';
+
+    $query = "SELECT * FROM flippityFlop";
+    // Run & Build table
 
 }
 
@@ -76,9 +92,9 @@ function awp_list_cards () {
  * 
 */
 
-add_shortcode( 'awpshort', 'awp_shortcode' );
+add_shortcode( 'obrshort', 'obr_shortcode' );
 
-function awp_shortcode ( $atts = [], $awpID = null ) { 
+function obr_shortcode ( $atts = [], $flippinID = null ) { 
 
     global $wpdb;
 
@@ -104,6 +120,20 @@ function init() {
 
     // Install Database Tables
 
+    $sql = "CREATE TABLE flippityFlop ( 
+        flippinID           INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        flippinName         VARCHAR(50),
+        flippinQuestion     VARCHAR(255),
+        flippinAnswer       VARCHAR(255),
+        flippinType         VARCHAR(5)
+        )
+    ";
+
+    require_once ( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    if ( dbDelta ( $sql ) ) { 
+        echo 'Installed Ok!';
+    }
+    
     // Exit with actions taken - Comment out when done.
     exit( var_dump( $_GET ) );
 
